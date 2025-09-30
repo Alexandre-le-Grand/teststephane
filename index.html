@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes Services Serveur Privé</title>
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+    body {
+        font-family: 'Inter', sans-serif;
+        min-height: 100vh;
+        background: linear-gradient(135deg, #6a11cb, #2575fc);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: flex-start;
+        padding: 50px 20px;
+        overflow-x: hidden;
+        color: #fff;
+    }
+    header {
+        text-align: center;
+        margin-bottom: 50px;
+    }
+    header h1 {
+        font-size: 3rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        text-shadow: 0 3px 6px rgba(0,0,0,0.3);
+    }
+    header p {
+        font-size: 1.2rem;
+        color: rgba(255,255,255,0.85);
+    }
+    .services {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 30px;
+        width: 100%;
+        max-width: 1200px;
+    }
+    .service-card {
+        background: rgba(255,255,255,0.1);
+        backdrop-filter: blur(10px);
+        border-radius: 20px;
+        padding: 30px 20px;
+        text-align: center;
+        transition: transform 0.3s ease, box-shadow 0.3s ease;
+        cursor: pointer;
+        border: 1px solid rgba(255,255,255,0.2);
+    }
+    .service-card:hover {
+        transform: translateY(-10px) scale(1.05);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.3);
+        background: rgba(255,255,255,0.15);
+    }
+    .service-title {
+        font-size: 1.3rem;
+        font-weight: 600;
+        margin-bottom: 12px;
+    }
+    .service-desc {
+        font-size: 0.95rem;
+        color: rgba(255,255,255,0.85);
+        line-height: 1.4;
+    }
+    @keyframes gradientShift {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
+    }
+    body {
+        background-size: 400% 400%;
+        animation: gradientShift 20s ease infinite;
+    }
+    @media (max-width: 500px) {
+        header h1 {
+            font-size: 2rem;
+        }
+        .service-card {
+            padding: 25px 15px;
+        }
+    }
+</style>
+</head>
+<body>
+
+<header>
+    <h1>Mon site web</h1>
+    <p>THOMAS Alexandre</p>
+</header>
+
+<div class="services">
+
+    <!-- Mes service privé -->
+    <div class="service-card" onclick="window.location.href='pages/servicePrivate.html'">
+        <div class="service-title">Mes service privé</div>
+        <div class="service-desc">Accédez à l’ensemble de mes services privés et applications personnelles.</div>
+    </div>
+
+
+    <!-- Nextcloud -->
+    <div class="service-card" onclick="window.location.href ='pages/page-syno.html'">
+        <div class="service-title">Mes projets personnelles</div>
+        <div class="service-desc">Découvrez mes projets personnels.</div>
+    </div> 
+    
+
+    <!-- Base de Données -->
+    <div class="service-card" onclick="window.open('#', '_blank')">
+        <div class="service-title">Base de Données</div>
+        <div class="service-desc">Hébergement de bases de données MySQL/PostgreSQL.</div>
+    </div>
+
+    <!-- Reseaux Sociaux -->
+    <div class="service-card" onclick="window.location.href='pages/page-reseaux.html'">
+        <div class="service-title">Reseaux Sociaux</div>
+        <div class="service-desc">Hébergement de bases de données MySQL/PostgreSQL.</div>
+    </div>
+
+</div>
+ 
+</body>
+</html>
