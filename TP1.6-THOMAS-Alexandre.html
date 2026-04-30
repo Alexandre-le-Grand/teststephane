@@ -1,0 +1,1780 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TP 1.6 — Exigences transverses & Matrice de traçabilité SupEvents — THOMAS Alexandre</title>
+<style>
+  /* ===== BASE & TYPOGRAPHY ===== */
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+  :root {
+    --primary: #1a56db;
+    --primary-light: #e8f0fe;
+    --secondary: #374151;
+    --accent: #dc2626;
+    --success: #16a34a;
+    --warning: #d97706;
+    --border: #e5e7eb;
+    --bg-code: #f8fafc;
+    --text: #111827;
+    --text-muted: #6b7280;
+    --stride-s: #fef2f2;
+    --stride-t: #fff7ed;
+    --stride-r: #fefce8;
+    --stride-i: #f0fdf4;
+    --stride-d: #eff6ff;
+    --stride-e: #faf5ff;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, sans-serif;
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text);
+    background: #f9fafb;
+  }
+
+  /* ===== PAGE LAYOUT ===== */
+  .page-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+    background: white;
+    box-shadow: 0 1px 3px rgba(0,0,0,.1), 0 4px 20px rgba(0,0,0,.06);
+  }
+
+  /* ===== COVER PAGE ===== */
+  .cover {
+    background: linear-gradient(135deg, #1e3a8a 0%, #1a56db 50%, #3b82f6 100%);
+    color: white;
+    padding: 80px 60px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: -60px; right: -60px;
+    width: 300px; height: 300px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.05);
+  }
+  .cover::after {
+    content: '';
+    position: absolute;
+    bottom: -80px; left: -40px;
+    width: 250px; height: 250px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.04);
+  }
+  .cover-badge {
+    display: inline-block;
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.3);
+    border-radius: 20px;
+    padding: 4px 16px;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    margin-bottom: 28px;
+  }
+  .cover h1 {
+    font-size: 36px;
+    font-weight: 700;
+    line-height: 1.2;
+    margin-bottom: 16px;
+    max-width: 700px;
+  }
+  .cover-subtitle {
+    font-size: 18px;
+    opacity: 0.85;
+    margin-bottom: 48px;
+    font-weight: 300;
+  }
+  .cover-meta {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+    border-top: 1px solid rgba(255,255,255,0.2);
+    padding-top: 32px;
+  }
+  .cover-meta-item label {
+    display: block;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    opacity: 0.6;
+    margin-bottom: 4px;
+  }
+  .cover-meta-item span {
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  /* ===== CONTENT AREA ===== */
+  .content {
+    padding: 0 60px 60px;
+  }
+
+  /* ===== TABLE OF CONTENTS ===== */
+  .toc {
+    background: var(--primary-light);
+    border-left: 4px solid var(--primary);
+    border-radius: 0 8px 8px 0;
+    padding: 28px 32px;
+    margin: 40px 0;
+  }
+  .toc h2 {
+    font-size: 13px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--primary);
+    margin-bottom: 16px;
+  }
+  .toc ol {
+    list-style: none;
+    counter-reset: toc;
+  }
+  .toc > ol > li {
+    counter-increment: toc;
+    margin-bottom: 8px;
+  }
+  .toc a {
+    color: var(--secondary);
+    text-decoration: none;
+    font-weight: 500;
+  }
+  .toc a:hover { color: var(--primary); }
+  .toc .toc-sub {
+    margin-left: 20px;
+    margin-top: 4px;
+  }
+  .toc .toc-sub li {
+    font-size: 13px;
+    color: var(--text-muted);
+    margin-bottom: 3px;
+  }
+
+  /* ===== SECTIONS & HEADINGS ===== */
+  .section-divider {
+    border: none;
+    border-top: 2px solid var(--border);
+    margin: 48px 0 32px;
+  }
+
+  h2.section-title {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--primary);
+    padding-bottom: 10px;
+    border-bottom: 2px solid var(--primary);
+    margin-bottom: 28px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  h2.section-title .num {
+    background: var(--primary);
+    color: white;
+    border-radius: 6px;
+    padding: 2px 10px;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  h3.sub-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: var(--secondary);
+    margin: 32px 0 16px;
+    padding-left: 12px;
+    border-left: 3px solid var(--primary);
+  }
+
+  h4.sub-sub-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--secondary);
+    margin: 24px 0 12px;
+  }
+
+  p {
+    margin-bottom: 12px;
+    color: #374151;
+  }
+
+  /* ===== CALLOUT BOXES ===== */
+  .callout {
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 20px 0;
+    font-size: 13.5px;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+  .callout.info { background: #eff6ff; border-left: 4px solid #3b82f6; }
+  .callout.warning { background: #fffbeb; border-left: 4px solid #f59e0b; }
+  .callout.danger { background: #fef2f2; border-left: 4px solid #ef4444; }
+  .callout.success { background: #f0fdf4; border-left: 4px solid #22c55e; }
+  .callout-icon { font-size: 18px; flex-shrink: 0; margin-top: 1px; }
+  .callout-content strong { display: block; margin-bottom: 4px; }
+
+  /* ===== FLUX DESCRIPTION ===== */
+  .flux-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+    margin: 24px 0;
+    box-shadow: 0 1px 4px rgba(0,0,0,.06);
+  }
+  .flux-card-header {
+    background: linear-gradient(90deg, #1e3a8a, #1a56db);
+    color: white;
+    padding: 16px 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .flux-badge {
+    background: rgba(255,255,255,0.2);
+    border-radius: 20px;
+    padding: 2px 12px;
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .flux-card-header h3 {
+    font-size: 16px;
+    font-weight: 600;
+  }
+
+  /* ===== SEQUENCE DIAGRAM ===== */
+  .diagram-box {
+    background: var(--bg-code);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 20px 24px;
+    margin: 16px 0;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12.5px;
+    line-height: 1.6;
+    overflow-x: auto;
+    white-space: pre;
+    color: #1e293b;
+  }
+  .diagram-label {
+    font-size: 11px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+  }
+
+  /* Visual sequence diagram */
+  .seq-diagram {
+    background: #fafbff;
+    border: 1px solid #dbeafe;
+    border-radius: 12px;
+    padding: 24px;
+    margin: 16px 0;
+    overflow-x: auto;
+  }
+  .seq-diagram table {
+    border-collapse: collapse;
+    font-size: 12px;
+    min-width: 100%;
+  }
+  .seq-actors {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+  .seq-actor {
+    background: #1a56db;
+    color: white;
+    border-radius: 6px;
+    padding: 6px 14px;
+    font-size: 11.5px;
+    font-weight: 600;
+    text-align: center;
+  }
+  .seq-actor.external {
+    background: #7c3aed;
+  }
+  .seq-actor.infra {
+    background: #059669;
+  }
+  .seq-steps {
+    list-style: none;
+    counter-reset: step;
+  }
+  .seq-step {
+    counter-increment: step;
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 8px 0;
+    border-bottom: 1px dashed #e5e7eb;
+    font-size: 13px;
+  }
+  .seq-step:last-child { border-bottom: none; }
+  .seq-step::before {
+    content: counter(step);
+    background: #1a56db;
+    color: white;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+  .seq-step .arrow { color: var(--primary); font-weight: 700; margin: 0 4px; }
+  .seq-step .method { 
+    font-family: 'JetBrains Mono', monospace; 
+    background: #eff6ff; 
+    color: #1a56db; 
+    padding: 1px 6px; 
+    border-radius: 4px; 
+    font-size: 11.5px; 
+  }
+  .seq-step .note {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 2px;
+    display: block;
+  }
+  .seq-step.alt-step {
+    background: #fef3c7;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin: 4px 0;
+  }
+
+  /* ===== STRIDE TABLE ===== */
+  .stride-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 16px 0;
+    font-size: 13px;
+  }
+  .stride-table th {
+    background: #1e3a8a;
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .stride-table th:first-child { width: 14%; }
+  .stride-table th:nth-child(2) { width: 40%; }
+  .stride-table th:nth-child(3) { width: 46%; }
+  .stride-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .stride-table tr:last-child td { border-bottom: none; }
+  .stride-s td { background: var(--stride-s); }
+  .stride-t td { background: var(--stride-t); }
+  .stride-r td { background: var(--stride-r); }
+  .stride-i td { background: var(--stride-i); }
+  .stride-d td { background: var(--stride-d); }
+  .stride-e td { background: var(--stride-e); }
+  .stride-badge {
+    display: inline-block;
+    font-weight: 700;
+    font-size: 13px;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .stride-s .stride-badge { background: #fca5a5; color: #991b1b; }
+  .stride-t .stride-badge { background: #fed7aa; color: #92400e; }
+  .stride-r .stride-badge { background: #fef08a; color: #713f12; }
+  .stride-i .stride-badge { background: #bbf7d0; color: #14532d; }
+  .stride-d .stride-badge { background: #bfdbfe; color: #1e40af; }
+  .stride-e .stride-badge { background: #e9d5ff; color: #581c87; }
+  .stride-table .risk { font-weight: 500; }
+  .stride-table .defense { color: #065f46; }
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    background: #f1f5f9;
+    color: #0f172a;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 12px;
+  }
+
+  /* ===== PERFORMANCE CARDS ===== */
+  .perf-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .perf-card-header {
+    background: #f8fafc;
+    border-bottom: 1px solid var(--border);
+    padding: 12px 20px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .perf-ref {
+    background: var(--primary);
+    color: white;
+    border-radius: 5px;
+    padding: 3px 10px;
+    font-size: 12px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+  }
+  .perf-card-header h4 {
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--secondary);
+  }
+  .perf-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .perf-table tr { border-bottom: 1px solid var(--border); }
+  .perf-table tr:last-child { border-bottom: none; }
+  .perf-table td:first-child {
+    background: #f8fafc;
+    font-weight: 600;
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    padding: 12px 16px;
+    width: 200px;
+    vertical-align: top;
+    border-right: 1px solid var(--border);
+  }
+  .perf-table td:last-child {
+    padding: 12px 16px;
+    font-size: 13px;
+    vertical-align: top;
+  }
+  .slo-highlight {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #fef3c7;
+    border: 1px solid #f59e0b;
+    border-radius: 6px;
+    padding: 6px 12px;
+    font-weight: 700;
+    font-size: 14px;
+    color: #92400e;
+    margin-bottom: 8px;
+  }
+  .error-budget-box {
+    background: linear-gradient(135deg, #1e3a8a, #1a56db);
+    color: white;
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 16px 0;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex-wrap: wrap;
+  }
+  .error-budget-box .budget-label {
+    font-size: 12px;
+    opacity: 0.7;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+  .error-budget-box .budget-value {
+    font-size: 24px;
+    font-weight: 700;
+    display: block;
+  }
+  .error-budget-box .budget-eq {
+    font-size: 13px;
+    opacity: 0.85;
+    margin-top: 2px;
+  }
+
+  /* ===== GDPR ===== */
+  .gdpr-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin: 16px 0;
+  }
+  .gdpr-table th {
+    background: #1e3a8a;
+    color: white;
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .gdpr-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .gdpr-table tr:nth-child(even) td { background: #f9fafb; }
+  .gdpr-table tr:hover td { background: #eff6ff; transition: background 0.15s; }
+  .legal-basis {
+    display: inline-block;
+    font-size: 11px;
+    padding: 2px 8px;
+    border-radius: 10px;
+    font-weight: 500;
+  }
+  .lb-contract { background: #d1fae5; color: #065f46; }
+  .lb-legal { background: #dbeafe; color: #1e40af; }
+  .lb-consent { background: #f3e8ff; color: #581c87; }
+  .lb-legit { background: #fef3c7; color: #92400e; }
+
+  .mechanism-list {
+    list-style: none;
+    margin: 12px 0;
+  }
+  .mechanism-list li {
+    display: flex;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    align-items: flex-start;
+  }
+  .mechanism-list li:last-child { border-bottom: none; }
+  .mechanism-list li::before {
+    content: '🔒';
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+  .mechanism-list strong { color: var(--primary); }
+
+  .rights-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 20px 0;
+  }
+  .right-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .right-card-header {
+    padding: 14px 16px;
+    font-weight: 700;
+    font-size: 13px;
+    color: white;
+  }
+  .right-art15 .right-card-header { background: #2563eb; }
+  .right-art17 .right-card-header { background: #dc2626; }
+  .right-art16 .right-card-header { background: #16a34a; }
+  .right-card-body {
+    padding: 14px 16px;
+  }
+  .right-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    margin-bottom: 10px;
+    font-size: 12.5px;
+  }
+  .right-row label {
+    font-weight: 600;
+    font-size: 10.5px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+  }
+  .tension-box {
+    background: #fef9c3;
+    border: 1px solid #fde047;
+    border-radius: 8px;
+    padding: 14px 16px;
+    margin: 12px 0;
+    font-size: 12.5px;
+  }
+  .tension-box strong { color: #713f12; display: block; margin-bottom: 6px; }
+
+  /* ===== TRACEABILITY MATRIX ===== */
+  .matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12.5px;
+    margin: 16px 0;
+  }
+  .matrix-table th {
+    background: #1e3a8a;
+    color: white;
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 11.5px;
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+  }
+  .matrix-table td {
+    padding: 9px 12px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: top;
+  }
+  .matrix-table tr:nth-child(even) td { background: #f9fafb; }
+  .matrix-ref {
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 700;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+  .ref-ef { color: #1a56db; }
+  .ref-enf { color: #7c3aed; }
+  .module-tag {
+    display: inline-block;
+    background: #eff6ff;
+    color: #1a56db;
+    border: 1px solid #bfdbfe;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 1px 2px;
+  }
+  .section-tag {
+    display: inline-block;
+    background: #f0fdf4;
+    color: #16a34a;
+    border: 1px solid #bbf7d0;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 1px 2px;
+  }
+  .adr-tag {
+    display: inline-block;
+    background: #faf5ff;
+    color: #7c3aed;
+    border: 1px solid #e9d5ff;
+    border-radius: 4px;
+    padding: 1px 7px;
+    font-size: 11px;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 1px 2px;
+  }
+  .not-covered {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    background: #fff7ed;
+    color: #c2410c;
+    border: 1px solid #fdba74;
+    border-radius: 4px;
+    padding: 2px 8px;
+    font-size: 11.5px;
+    font-weight: 500;
+  }
+  .matrix-ef-group td { background: #eff6ff !important; }
+  .matrix-enf-group td { background: #f5f3ff !important; }
+
+  /* ===== SYNTHESIS ===== */
+  .coverage-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin: 24px 0;
+  }
+  .stat-card {
+    background: white;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 20px;
+    text-align: center;
+    box-shadow: 0 1px 3px rgba(0,0,0,.05);
+  }
+  .stat-value {
+    font-size: 36px;
+    font-weight: 700;
+    display: block;
+  }
+  .stat-value.good { color: var(--success); }
+  .stat-value.warn { color: var(--warning); }
+  .stat-label {
+    font-size: 12px;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    margin-top: 4px;
+  }
+  .progress-bar-wrap {
+    margin-top: 12px;
+    background: #f1f5f9;
+    border-radius: 10px;
+    height: 8px;
+    overflow: hidden;
+  }
+  .progress-bar {
+    height: 100%;
+    border-radius: 10px;
+    background: linear-gradient(90deg, #16a34a, #22c55e);
+  }
+  .progress-bar.partial { background: linear-gradient(90deg, #d97706, #fbbf24); }
+
+  /* ===== MODULE COVERAGE TABLE ===== */
+  .module-coverage-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    margin: 16px 0;
+  }
+  .module-coverage-table th {
+    background: #374151;
+    color: white;
+    padding: 10px 14px;
+    text-align: left;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  .module-coverage-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    vertical-align: middle;
+  }
+  .module-coverage-table tr:nth-child(even) td { background: #f9fafb; }
+  .status-ok { color: #16a34a; font-weight: 700; }
+  .status-warn { color: #d97706; font-weight: 700; }
+
+  /* ===== CHECKLIST ===== */
+  .checklist {
+    list-style: none;
+    margin: 16px 0;
+  }
+  .checklist li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check-ok { color: #16a34a; font-size: 18px; }
+  .check-warn { color: #d97706; font-size: 18px; }
+
+  /* ===== FOOTER ===== */
+  .doc-footer {
+    background: #1e3a8a;
+    color: rgba(255,255,255,0.7);
+    padding: 24px 60px;
+    font-size: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* ===== PRINT ===== */
+  @media print {
+    body { background: white; }
+    .page-wrapper { box-shadow: none; max-width: 100%; }
+    .cover { print-color-adjust: exact; -webkit-print-color-adjust: exact; }
+    h2.section-title, h3.sub-title { page-break-after: avoid; }
+    .flux-card, .perf-card, .right-card { page-break-inside: avoid; }
+    .stride-table { page-break-inside: auto; }
+    .stride-table tr { page-break-inside: avoid; }
+  }
+
+  /* ===== TOOLTIP INLINE ===== */
+  .tag {
+    display: inline-block;
+    font-size: 10.5px;
+    font-weight: 600;
+    padding: 1px 6px;
+    border-radius: 3px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+  .tag-blue { background: #dbeafe; color: #1e40af; }
+  .tag-green { background: #d1fae5; color: #065f46; }
+  .tag-purple { background: #ede9fe; color: #5b21b6; }
+  .tag-orange { background: #ffedd5; color: #9a3412; }
+  .tag-red { background: #fee2e2; color: #991b1b; }
+</style>
+</head>
+<body>
+
+<!-- ===== COVER PAGE ===== -->
+<div class="page-wrapper">
+<div class="cover">
+  <div class="cover-badge">DCT SupEvents — Bloc 6</div>
+  <h1>TP 1.6 — Exigences transverses &amp; Matrice de traçabilité</h1>
+  <p class="cover-subtitle">Documentation de Conception Technique · Sections §9 et §10</p>
+  <div class="cover-meta">
+    <div class="cover-meta-item">
+      <label>Auteur</label>
+      <span>THOMAS Alexandre</span>
+    </div>
+    <div class="cover-meta-item">
+      <label>Projet</label>
+      <span>SupEvents</span>
+    </div>
+    <div class="cover-meta-item">
+      <label>Date</label>
+      <span>30 Avril 2026</span>
+    </div>
+    <div class="cover-meta-item">
+      <label>Durée TP</label>
+      <span>2h15</span>
+    </div>
+    <div class="cover-meta-item">
+      <label>Prérequis</label>
+      <span>TP 1.5 complété</span>
+    </div>
+    <div class="cover-meta-item">
+      <label>Note max</label>
+      <span>20 points</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== TABLE OF CONTENTS ===== -->
+<div class="content">
+  <div class="toc">
+    <h2>Sommaire</h2>
+    <ol>
+      <li><a href="#s9">§9 — Exigences transverses</a>
+        <ul class="toc-sub">
+          <li><a href="#s91">§9.1 — Sécurité (analyse STRIDE)</a>
+            <ul class="toc-sub" style="margin-top:2px">
+              <li><a href="#s911">§9.1.1 — Flux 1 : Inscription payante</a></li>
+              <li><a href="#s912">§9.1.2 — Flux 2 : Réception webhook Stripe</a></li>
+            </ul>
+          </li>
+          <li><a href="#s92">§9.2 — Performance (SLO)</a></li>
+          <li><a href="#s93">§9.3 — RGPD</a></li>
+        </ul>
+      </li>
+      <li><a href="#s10">§10 — Matrice de traçabilité</a>
+        <ul class="toc-sub">
+          <li><a href="#s101">§10.1 — Matrice principale (21 exigences)</a></li>
+          <li><a href="#s102">§10.2 — Synthèse &amp; couverture</a></li>
+        </ul>
+      </li>
+      <li><a href="#revue">Phase D — Revue de cohérence</a></li>
+    </ol>
+  </div>
+
+  <!-- ============================= -->
+  <!-- §9 — EXIGENCES TRANSVERSES   -->
+  <!-- ============================= -->
+  <h2 class="section-title" id="s9"><span class="num">§9</span> Exigences transverses</h2>
+
+  <p>Ce document constitue les sections §9 et §10 de la DCT SupEvents. Il transforme la DCT d'un document descriptif en un document auditable : l'analyse STRIDE couvre les deux flux financiers critiques de la plateforme, les SLO chiffrés définissent les engagements de performance, et la matrice de traçabilité permet à tout auditeur de vérifier la couverture complète des 21 exigences du CDC.</p>
+
+  <!-- ============================= -->
+  <!-- §9.1 — STRIDE                 -->
+  <!-- ============================= -->
+  <h3 class="sub-title" id="s91">§9.1 — Sécurité (analyse STRIDE)</h3>
+
+  <p>L'analyse STRIDE est appliquée aux deux flux les plus critiques du système : le <strong>flux d'inscription payante</strong> (cœur du modèle économique) et le <strong>flux de réception webhook Stripe</strong> (point d'entrée des confirmations de paiement). Ces deux flux ont été retenus car ils sont techniquement distincts — l'un implique une session utilisateur interactive, l'autre un appel serveur-à-serveur non authentifié par session — et couvrent ensemble la quasi-totalité des vecteurs d'attaque financiers de la plateforme.</p>
+
+  <!-- FLUX 1 -->
+  <h4 class="sub-sub-title" id="s911">§9.1.1 — Flux 1 : Inscription payante</h4>
+
+  <div class="flux-card">
+    <div class="flux-card-header">
+      <span class="flux-badge">Flux 1</span>
+      <h3>Inscription payante</h3>
+      <span style="margin-left:auto;font-size:12px;opacity:0.7">EventModule · TicketModule · PaymentModule · Stripe · RabbitMQ</span>
+    </div>
+
+    <div style="padding:20px 24px">
+      <div class="diagram-label">Diagramme de séquence</div>
+      <div class="seq-diagram">
+        <div class="seq-actors">
+          <div class="seq-actor">U : Utilisateur</div>
+          <div class="seq-actor">FE : Frontend (SPA)</div>
+          <div class="seq-actor">EM : EventModule</div>
+          <div class="seq-actor">TM : TicketModule</div>
+          <div class="seq-actor">PM : PaymentModule</div>
+          <div class="seq-actor external">ST : Stripe</div>
+          <div class="seq-actor infra">RMQ : RabbitMQ</div>
+          <div class="seq-actor infra">DB : PostgreSQL</div>
+        </div>
+        <ol class="seq-steps">
+          <li class="seq-step">
+            <span><strong>U</strong><span class="arrow">→</span><strong>FE</strong> : Clic « S'inscrire » sur fiche événement</span>
+          </li>
+          <li class="seq-step">
+            <span><strong>FE</strong><span class="arrow">→</span><strong>EM</strong> : <code>GET /events/{id}</code> — vérification disponibilité</span>
+          </li>
+          <li class="seq-step">
+            <span><strong>EM</strong><span class="arrow">→</span><strong>DB</strong> : <code>SELECT places_restantes WHERE event_id = {id}</code></span>
+          </li>
+          <li class="seq-step">
+            <span><strong>EM</strong><span class="arrow">→</span><strong>FE</strong> : <code>200 OK { disponible: true, prix: 15.00 }</code></span>
+          </li>
+          <li class="seq-step">
+            <span><strong>FE</strong><span class="arrow">→</span><strong>TM</strong> : <code>POST /tickets</code> <code>{ eventId, userId }</code> <span class="tag tag-blue">JWT Bearer</span></span>
+            <span class="note">TM crée une réservation temporaire en base (TTL 10 min) via <code>SELECT FOR UPDATE</code></span>
+          </li>
+          <li class="seq-step">
+            <span><strong>TM</strong><span class="arrow">→</span><strong>PM</strong> : <code>POST /payments { ticketId, montant: 1500 }</code> <span class="tag tag-orange">service token</span></span>
+          </li>
+          <li class="seq-step">
+            <span><strong>PM</strong><span class="arrow">→</span><strong>ST</strong> : <code>POST /v1/payment_intents { amount, currency, metadata }</code></span>
+          </li>
+          <li class="seq-step">
+            <span><strong>ST</strong><span class="arrow">→</span><strong>PM</strong><span class="arrow">→</span><strong>FE</strong> : <code>{ clientSecret, paymentIntentId }</code></span>
+          </li>
+          <li class="seq-step alt-step">
+            <span><strong>FE</strong><span class="arrow">→</span><strong>ST</strong> : <code>Stripe.js confirmCardPayment(clientSecret)</code> — 3DS si requis <span class="tag tag-red">Direct FE→Stripe, coordonnées bancaires jamais côté serveur</span></span>
+          </li>
+          <li class="seq-step">
+            <span><strong>FE</strong><span class="arrow">→</span><strong>PM</strong> : <code>POST /payments/{paymentIntentId}/confirm</code> <span class="tag tag-blue">JWT Bearer</span></span>
+          </li>
+          <li class="seq-step">
+            <span><strong>PM</strong><span class="arrow">→</span><strong>ST</strong> : <code>GET /v1/payment_intents/{id}</code> — re-vérification serveur-to-Stripe</span>
+            <span class="note">Double vérification : le montant et le statut sont confirmés côté Stripe avant toute écriture en base</span>
+          </li>
+          <li class="seq-step">
+            <span><strong>PM</strong><span class="arrow">→</span><strong>DB</strong> : <code>UPDATE payments SET status = CAPTURED</code></span>
+          </li>
+          <li class="seq-step">
+            <span><strong>PM</strong><span class="arrow">→</span><strong>RMQ</strong> : <code>publish(payment.captured, { ticketId, userId, eventId })</code></span>
+          </li>
+          <li class="seq-step">
+            <span><strong>RMQ</strong><span class="arrow">→</span><strong>TM</strong> : <code>consume(payment.captured)</code></span>
+          </li>
+          <li class="seq-step">
+            <span><strong>TM</strong><span class="arrow">→</span><strong>DB</strong> : <code>UPDATE tickets SET status = CONFIRMED</code> → Email de confirmation SendGrid</span>
+          </li>
+        </ol>
+      </div>
+
+      <h4 class="sub-sub-title" style="margin-top:20px">Description du flux</h4>
+      <p>L'utilisateur, préalablement authentifié (JWT valide), clique sur « S'inscrire » : le frontend interroge l'EventModule pour vérifier la disponibilité en temps réel, puis le TicketModule crée immédiatement une réservation temporaire en base avec un TTL de 10 minutes — ceci protège contre la sur-vente en conditions de concurrence (<code>SELECT FOR UPDATE</code>). Le PaymentModule délègue ensuite la création du PaymentIntent à Stripe et renvoie le <code>clientSecret</code> au frontend ; à aucun moment les coordonnées bancaires ne transitent par nos serveurs (conformité PCI-DSS niveau 4). Le navigateur appelle directement Stripe.js pour la saisie de la carte et la confirmation 3DS si requise. Une fois le paiement confirmé côté client, le frontend notifie notre PaymentModule qui re-vérifie l'état du PaymentIntent côté Stripe avant de mettre à jour la base et de publier l'événement <code>payment.captured</code> dans RabbitMQ. Le TicketModule consomme cet événement et confirme définitivement le ticket, déclenchant l'envoi de l'email de confirmation. Ce découplage par message garantit que la confirmation n'est émise que si le paiement est effectivement capturé.</p>
+
+      <h4 class="sub-sub-title" style="margin-top:20px">Tableau STRIDE</h4>
+      <table class="stride-table">
+        <thead>
+          <tr>
+            <th>Menace</th>
+            <th>Risque identifié</th>
+            <th>Mesure de défense retenue</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="stride-s">
+            <td><span class="stride-badge">S</span><br><small>Spoofing</small></td>
+            <td class="risk">Un attaquant usurpe l'identité d'un utilisateur légitime pour acheter un ticket à sa place, en rejouant un JWT volé via une connexion non-TLS.</td>
+            <td class="defense">Tous les endpoints API requièrent un JWT signé <strong>RS256</strong> avec expiration 15 min. Le refresh token est stocké en cookie <code>HttpOnly SameSite=Strict</code>, inaccessible au JavaScript. TLS 1.3 obligatoire sur tous les appels ; HSTS <code>max-age=31536000</code>.</td>
+          </tr>
+          <tr class="stride-t">
+            <td><span class="stride-badge">T</span><br><small>Tampering</small></td>
+            <td class="risk">Un attaquant intercepte et modifie le montant du PaymentIntent en transit (ex. passer de 1500 à 1) pour payer moins.</td>
+            <td class="defense">Le <code>clientSecret</code> Stripe est lié au montant fixé <strong>serveur-side</strong> lors de la création ; toute modification côté client est rejetée par Stripe. Re-vérification serveur-to-Stripe (<code>GET /v1/payment_intents/{id}</code>) avant toute mise à jour en base.</td>
+          </tr>
+          <tr class="stride-r">
+            <td><span class="stride-badge">R</span><br><small>Repudiation</small></td>
+            <td class="risk">Un utilisateur conteste avoir initié l'inscription ou le paiement, rendant difficile la preuve de l'action.</td>
+            <td class="defense">Chaque étape est journalisée avec horodatage, <code>userId</code>, <code>ticketId</code> et <code>paymentIntentId</code> dans la table <code>audit_events</code> (insertion <strong>append-only</strong> via trigger PostgreSQL). Le <code>paymentIntentId</code> Stripe constitue une preuve externe indépendante.</td>
+          </tr>
+          <tr class="stride-i">
+            <td><span class="stride-badge">I</span><br><small>Information Disclosure</small></td>
+            <td class="risk">Les données de carte bancaire de l'utilisateur sont exposées dans les logs applicatifs ou dans les réponses API.</td>
+            <td class="defense">Coordonnées bancaires traitées uniquement par <strong>Stripe.js</strong>, jamais par nos serveurs. Middleware de sanitisation masquant <code>cvv</code>, <code>cardNumber</code>, <code>clientSecret</code> dans tous les logs stdout. Colonne <code>stripe_customer_id</code> chiffrée en base (AES-256 via pgcrypto).</td>
+          </tr>
+          <tr class="stride-d">
+            <td><span class="stride-badge">D</span><br><small>Denial of Service</small></td>
+            <td class="risk">Un attaquant déclenche en masse des créations de tickets <code>PENDING</code> pour épuiser les places disponibles et bloquer les inscriptions légitimes.</td>
+            <td class="defense">TTL 10 min sur tickets <code>PENDING</code> — libération automatique si paiement non finalisé. <strong>Rate-limiter</strong> (Nginx + Redis) : 5 tentatives/utilisateur/événement par 60 secondes. Réservation via <code>SELECT FOR UPDATE</code> dans une transaction PostgreSQL pour éviter la sur-vente.</td>
+          </tr>
+          <tr class="stride-e">
+            <td><span class="stride-badge">E</span><br><small>Elevation of Privilege</small></td>
+            <td class="risk">Le service TicketModule utilise un token lui permettant d'accéder aux endpoints d'administration de PaymentModule (remboursements, annulations globales).</td>
+            <td class="defense">Service tokens à portée restreinte (OAuth 2.0 scope <code>payment:create</code> uniquement pour TicketModule). Endpoints d'admin (<code>/payments/refund</code>) nécessitent le scope <code>payment:admin</code>, attribué exclusivement aux identités ops via le provider OIDC interne.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- FLUX 2 -->
+  <h4 class="sub-sub-title" id="s912">§9.1.2 — Flux 2 : Réception webhook Stripe</h4>
+
+  <div class="callout warning">
+    <span class="callout-icon">⚠️</span>
+    <div class="callout-content">
+      <strong>Point d'attention conceptuel critique</strong>
+      Ce flux est fondamentalement différent du flux d'inscription : il n'y a <strong>aucune session utilisateur, aucun JWT</strong>. L'authenticité de la requête est établie uniquement par une <strong>signature HMAC-SHA256</strong> (en-tête <code>Stripe-Signature</code>). Écrire « Auth JWT » comme mesure de défense serait une erreur conceptuelle.
+    </div>
+  </div>
+
+  <div class="flux-card">
+    <div class="flux-card-header">
+      <span class="flux-badge">Flux 2</span>
+      <h3>Réception webhook Stripe</h3>
+      <span style="margin-left:auto;font-size:12px;opacity:0.7">PaymentModule · RabbitMQ · PostgreSQL</span>
+    </div>
+
+    <div style="padding:20px 24px">
+      <div class="diagram-label">Diagramme de séquence</div>
+      <div class="seq-diagram">
+        <div class="seq-actors">
+          <div class="seq-actor external">ST : Stripe (externe)</div>
+          <div class="seq-actor infra">GW : API Gateway (Nginx)</div>
+          <div class="seq-actor">PM : PaymentModule</div>
+          <div class="seq-actor infra">DB : PostgreSQL</div>
+          <div class="seq-actor infra">RMQ : RabbitMQ</div>
+          <div class="seq-actor">TM : TicketModule</div>
+        </div>
+        <ol class="seq-steps">
+          <li class="seq-step">
+            <span><strong>ST</strong><span class="arrow">→</span><strong>GW</strong> : <code>POST /webhooks/stripe</code> <span class="tag tag-purple">type: "payment_intent.succeeded"</span></span>
+          </li>
+          <li class="seq-step alt-step">
+            <span><strong>GW</strong> : Vérification <strong>IP allowlist Stripe</strong> (plages officielles) avant forward</span>
+            <span class="note">Si IP non Stripe → 403 Forbidden, aucun log détaillé (pas d'oracle)</span>
+          </li>
+          <li class="seq-step">
+            <span><strong>GW</strong><span class="arrow">→</span><strong>PM</strong> : Forward complet avec header <code>Stripe-Signature</code></span>
+          </li>
+          <li class="seq-step alt-step">
+            <span><strong>PM</strong> : Vérification signature <strong>HMAC-SHA256</strong> sur le <em>payload brut</em> (avant tout parsing JSON) avec <code>STRIPE_WEBHOOK_SECRET</code></span>
+            <span class="note">Si signature invalide → 400 Bad Request sans détail</span>
+          </li>
+          <li class="seq-step">
+            <span><strong>PM</strong><span class="arrow">→</span><strong>DB</strong> : <code>SELECT * FROM payments WHERE stripe_payment_intent_id = {id}</code></span>
+          </li>
+          <li class="seq-step alt-step">
+            <span><strong>Idempotence</strong> : si paiement déjà <code>CAPTURED</code> → <code>200 OK</code> sans action (prévention du rejeu)</span>
+          </li>
+          <li class="seq-step">
+            <span><strong>PM</strong><span class="arrow">→</span><strong>DB</strong> : <code>BEGIN TRANSACTION</code> → <code>UPDATE payments SET status = CAPTURED</code> + <code>INSERT INTO audit_events</code></span>
+          </li>
+          <li class="seq-step">
+            <span><strong>PM</strong><span class="arrow">→</span><strong>RMQ</strong> : <code>publish(payment.captured, { paymentIntentId, ticketId, userId })</code></span>
+            <span class="note">Publication dans la même transaction → cohérence garantie (ou les deux réussissent, ou aucune)</span>
+          </li>
+          <li class="seq-step">
+            <span><strong>RMQ</strong><span class="arrow">→</span><strong>TM</strong> : <code>consume(payment.captured)</code> → <code>UPDATE tickets SET status = CONFIRMED</code></span>
+          </li>
+          <li class="seq-step">
+            <span><strong>PM</strong><span class="arrow">→</span><strong>ST</strong> : <code>200 OK</code></span>
+          </li>
+        </ol>
+      </div>
+
+      <h4 class="sub-sub-title" style="margin-top:20px">Description du flux</h4>
+      <p>Stripe envoie un POST HTTP sur notre endpoint <code>/webhooks/stripe</code> dès qu'un PaymentIntent change d'état. Ce flux n'implique aucune session utilisateur : l'authenticité est établie par une signature HMAC-SHA256 incluse dans l'en-tête <code>Stripe-Signature</code>. La première défense est une allowlist IP Nginx filtrée sur les plages officielles Stripe. Le PaymentModule recalcule la signature HMAC sur le <strong>payload brut</strong> (avant tout parsing JSON) — utiliser <code>req.body</code> parsé serait un bug de sécurité documenté. L'idempotence est garantie par une vérification en base avant toute mise à jour : si le paiement est déjà <code>CAPTURED</code>, on retourne 200 sans rejouer l'action. La mise à jour en base et la publication dans RabbitMQ sont réalisées dans la même transaction PostgreSQL pour garantir la cohérence.</p>
+
+      <h4 class="sub-sub-title" style="margin-top:20px">Tableau STRIDE</h4>
+      <table class="stride-table">
+        <thead>
+          <tr>
+            <th>Menace</th>
+            <th>Risque identifié</th>
+            <th>Mesure de défense retenue</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr class="stride-s">
+            <td><span class="stride-badge">S</span><br><small>Spoofing</small></td>
+            <td class="risk">Un attaquant forge une requête POST sur <code>/webhooks/stripe</code> en imitant Stripe pour déclencher une confirmation de paiement sans paiement réel.</td>
+            <td class="defense">Vérification obligatoire de la signature <strong>HMAC-SHA256</strong> via <code>stripe.webhooks.constructEvent(rawBody, sigHeader, secret)</code>. En complément : allowlist IP sur les plages officielles Stripe. Toute requête sans signature valide → 400 sans log détaillé (pas d'oracle).</td>
+          </tr>
+          <tr class="stride-t">
+            <td><span class="stride-badge">T</span><br><small>Tampering</small></td>
+            <td class="risk">Un attaquant intercepte le webhook en transit et modifie le montant ou le <code>paymentIntentId</code> pour créditer un autre ticket.</td>
+            <td class="defense">La signature HMAC-SHA256 est calculée sur le <strong>payload brut</strong> : toute modification d'un seul octet invalide la signature. Le corps de la requête est passé à <code>constructEvent</code> avant tout parsing JSON — il est impossible de modifier le payload sans invalider la signature.</td>
+          </tr>
+          <tr class="stride-r">
+            <td><span class="stride-badge">R</span><br><small>Repudiation</small></td>
+            <td class="risk">Stripe conteste avoir envoyé un webhook, ou notre système ne peut pas prouver qu'un événement a bien été traité à un moment donné.</td>
+            <td class="defense">Chaque webhook reçu est loggué en base (<code>webhook_events</code> : id, type, payload_hash, timestamp, status) <strong>avant</strong> tout traitement. Le <code>paymentIntentId</code> Stripe est vérifiable via l'API Stripe dashboard. Logs <strong>append-only</strong> (trigger PostgreSQL).</td>
+          </tr>
+          <tr class="stride-i">
+            <td><span class="stride-badge">I</span><br><small>Information Disclosure</small></td>
+            <td class="risk">Le payload du webhook contient des informations sensibles (email, montant, détails de carte partielle) loggués en clair dans les fichiers de log.</td>
+            <td class="defense">Seuls le <code>type</code>, le <code>paymentIntentId</code> et un <strong>hash du payload</strong> apparaissent dans les logs stdout. Le payload complet est stocké en base chiffré (AES-256). Niveau <code>DEBUG</code> désactivé en production. Logs rotatifs conservés 90 jours dans un stockage chiffré à accès restreint.</td>
+          </tr>
+          <tr class="stride-d">
+            <td><span class="stride-badge">D</span><br><small>Denial of Service</small></td>
+            <td class="risk">Un attaquant connaissant l'URL du webhook envoie des milliers de requêtes par seconde pour saturer le PaymentModule.</td>
+            <td class="defense"><strong>Rate-limiter dédié</strong> sur <code>/webhooks/stripe</code> : 60 req/min par IP (429 + <code>Retry-After</code>). La vérification HMAC est réalisée <em>avant</em> tout accès en base, limitant le coût des requêtes invalides. Autoscaling horizontal PaymentModule (min 2, max 6 pods) + circuit breaker sur RabbitMQ.</td>
+          </tr>
+          <tr class="stride-e">
+            <td><span class="stride-badge">E</span><br><small>Elevation of Privilege</small></td>
+            <td class="risk">L'endpoint webhook est accessible sans authentification ; un attaquant l'utilise pour déclencher des transitions d'état non autorisées (ex. passer un paiement directement en <code>REFUNDED</code>).</td>
+            <td class="defense"><strong>Liste blanche de types d'événements</strong> acceptés (<code>payment_intent.succeeded</code>, <code>payment_intent.payment_failed</code>, <code>charge.refunded</code>). <strong>Machine d'état en code</strong> (<code>PENDING→CAPTURED→REFUNDED</code> uniquement) — impossible de court-circuiter les transitions.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ============================= -->
+  <!-- §9.2 — PERFORMANCE            -->
+  <!-- ============================= -->
+  <h3 class="sub-title" id="s92">§9.2 — Performance</h3>
+
+  <p>Les trois exigences ci-dessous sont des SLO (Service Level Objectives) dérivés des exigences ENF 01 et ENF 02 du CDC SupEvents. Chaque fiche précise l'objectif mesurable avec percentile, la solution technique avec les mécanismes nommés, les composants impactés et la méthode de vérification avec outils et seuils d'alerte.</p>
+
+  <!-- PERF-01 -->
+  <div class="perf-card">
+    <div class="perf-card-header">
+      <span class="perf-ref">PERF-01</span>
+      <h4>Latence des endpoints critiques — Catalogue &amp; Inscription</h4>
+      <span style="margin-left:auto"><span class="tag tag-blue">ENF 01</span></span>
+    </div>
+    <table class="perf-table">
+      <tr>
+        <td>Objectif mesurable</td>
+        <td>
+          <div class="slo-highlight">🎯 p95 ≤ 500 ms</div>
+          Sur les endpoints <code>GET /events</code> (catalogue paginé), <code>GET /events/{id}</code> (fiche événement), <code>POST /tickets</code> (création de réservation). Mesuré en conditions de charge nominale : <strong>200 utilisateurs simultanés</strong>, fenêtre glissante de 5 minutes, excluant le temps de réponse de Stripe (appel externe non maîtrisé).
+        </td>
+      </tr>
+      <tr>
+        <td>Solution technique</td>
+        <td>
+          <ol style="padding-left:18px;line-height:1.9;font-size:13px">
+            <li><strong>Cache Redis</strong> sur <code>GET /events</code> et <code>GET /events/{id}</code> — TTL 60 s, invalidation sur mutation via événement <code>event.updated</code></li>
+            <li><strong>Index PostgreSQL composite</strong> <code>(status, date, category)</code> sur la table <code>events</code> pour les requêtes de filtrage catalogue</li>
+            <li><strong>Index PostgreSQL</strong> <code>(event_id, status)</code> sur la table <code>tickets</code> pour le comptage de places restantes</li>
+            <li><strong>Pagination curseur</strong> (keyset pagination) pour éviter les <code>OFFSET</code> coûteux au-delà de la page 3</li>
+            <li><strong>Pool de connexions PgBouncer</strong> (mode transaction, pool_size=20 par instance) pour éviter la saturation des connexions PostgreSQL</li>
+          </ol>
+        </td>
+      </tr>
+      <tr>
+        <td>Composants impactés</td>
+        <td><span class="module-tag">EventModule §7.1</span> <span class="module-tag">TicketModule §7.3</span> <span class="tag tag-green">Redis (cache)</span> <span class="tag tag-green">PostgreSQL</span></td>
+      </tr>
+      <tr>
+        <td>Méthode de vérification</td>
+        <td>
+          <strong>Outil :</strong> k6 (<code>load-test-catalogue.js</code> versionné dans le dépôt)<br>
+          <strong>Fréquence :</strong> CI automatique à chaque merge sur <code>main</code> + cron k6 Cloud toutes les 6h en production<br>
+          <strong>Seuils d'alerte :</strong> <span class="tag tag-orange">WARNING p95 &gt; 400 ms</span> <span class="tag tag-red">CRITICAL p95 &gt; 500 ms</span> sur 5 minutes consécutives → PagerDuty<br>
+          Dashboard Grafana + Prometheus pour visualisation temps réel
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- PERF-02 -->
+  <div class="perf-card">
+    <div class="perf-card-header">
+      <span class="perf-ref">PERF-02</span>
+      <h4>Disponibilité mensuelle de la plateforme</h4>
+      <span style="margin-left:auto"><span class="tag tag-purple">ENF 02</span></span>
+    </div>
+    <table class="perf-table">
+      <tr>
+        <td>Objectif mesurable</td>
+        <td>
+          <div class="slo-highlight">🎯 Disponibilité ≥ 99,5 %</div>
+          Sur l'ensemble des endpoints publics (catalogue, inscription, authentification), mesurée par monitoring externe (Uptime Robot) avec sonde toutes les 60 secondes depuis 3 régions géographiques.
+          <div class="error-budget-box">
+            <div>
+              <span class="budget-label">SLO cible</span>
+              <span class="budget-value">99,5 %</span>
+            </div>
+            <div>
+              <span class="budget-label">Budget d'erreur mensuel (30 jours)</span>
+              <span class="budget-value">3h 36 min</span>
+              <span class="budget-eq">= 0,5% × 43 200 min = <strong>216 minutes</strong></span>
+            </div>
+            <div>
+              <span class="budget-label">Calcul</span>
+              <span class="budget-eq" style="font-size:12px;margin-top:4px;display:block">43 200 min/mois × 0,005 = 216 min = 3h36<br>Ce budget est partagé entre déploiements planifiés et incidents.</span>
+            </div>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td>Solution technique</td>
+        <td>
+          <ol style="padding-left:18px;line-height:1.9;font-size:13px">
+            <li><strong>Déploiement blue-green</strong> sur Kubernetes — mises à jour sans coupure de service</li>
+            <li><strong>Réplication PostgreSQL</strong> en streaming (1 primaire + 1 réplica read) avec bascule automatique Patroni (failover &lt; 30 s)</li>
+            <li><strong>Redis Sentinel</strong> (3 nœuds) — bascule automatique en cas de défaillance du nœud primaire</li>
+            <li><strong>RabbitMQ en cluster</strong> (3 nœuds, mirrored queues) — élimination du SPOF sur le bus de messages</li>
+            <li><strong>Health checks Kubernetes</strong> (liveness + readiness probes) avec restart automatique des pods défaillants</li>
+          </ol>
+        </td>
+      </tr>
+      <tr>
+        <td>Composants impactés</td>
+        <td><span class="module-tag">Tous les modules §7.1–§7.7</span> <span class="tag tag-green">PostgreSQL</span> <span class="tag tag-green">Redis</span> <span class="tag tag-green">RabbitMQ</span> <span class="tag tag-green">Kubernetes</span></td>
+      </tr>
+      <tr>
+        <td>Méthode de vérification</td>
+        <td>
+          <strong>Outil :</strong> Uptime Robot (monitoring externe, sondes HTTPS depuis EU-West, EU-Central, US-East, toutes les 60 s)<br>
+          <strong>Fréquence :</strong> continue, en permanence<br>
+          <strong>Seuils d'alerte :</strong> Slack + PagerDuty si indisponibilité &gt; 5 minutes consécutives<br>
+          <strong>Gouvernance :</strong> Si budget consommé à &gt; 80% avant le 25 du mois → gel des déploiements non-urgents jusqu'au mois suivant
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <!-- PERF-03 -->
+  <div class="perf-card">
+    <div class="perf-card-header">
+      <span class="perf-ref">PERF-03</span>
+      <h4>Capacité à absorber un pic d'inscriptions concurrentes</h4>
+      <span style="margin-left:auto"><span class="tag tag-blue">ENF 01 — 500 utilisateurs simultanés</span></span>
+    </div>
+    <table class="perf-table">
+      <tr>
+        <td>Objectif mesurable</td>
+        <td>
+          <div class="slo-highlight">🎯 500 inscriptions simultanées</div>
+          Sans dépasser <code>p95 ≤ 800 ms</code>, sans erreur 5xx et <strong>zéro sur-vente</strong> (tickets confirmés &gt; capacité), dans une fenêtre de 60 secondes représentant un pic d'ouverture des inscriptions pour un événement populaire.
+        </td>
+      </tr>
+      <tr>
+        <td>Solution technique</td>
+        <td>
+          <ol style="padding-left:18px;line-height:1.9;font-size:13px">
+            <li><strong>Transaction PostgreSQL</strong> avec <code>SELECT FOR UPDATE SKIP LOCKED</code> pour la gestion concurrente sans deadlock</li>
+            <li><strong>Autoscaling horizontal</strong> du TicketModule (HPA Kubernetes : scale-out si CPU &gt; 60% ou file RabbitMQ &gt; 100 messages, min 2 / max 8 pods)</li>
+            <li><strong>File RabbitMQ</strong> avec <code>prefetch=10</code> pour lisser la charge et éviter la surcharge du TicketModule</li>
+            <li><strong>Circuit breaker</strong> (Resilience4j) sur les appels PaymentModule → Stripe avec fallback (mise en file de la confirmation) si timeout Stripe &gt; 3 s</li>
+            <li><strong>Jeton de réservation temporaire</strong> (TTL 10 min) pour éviter la sur-vente en cas d'abandon de paiement</li>
+          </ol>
+        </td>
+      </tr>
+      <tr>
+        <td>Composants impactés</td>
+        <td><span class="module-tag">TicketModule §7.3</span> <span class="module-tag">PaymentModule §7.4</span> <span class="tag tag-green">PostgreSQL</span> <span class="tag tag-green">RabbitMQ</span> <span class="tag tag-green">Kubernetes HPA</span></td>
+      </tr>
+      <tr>
+        <td>Méthode de vérification</td>
+        <td>
+          <strong>Outil :</strong> k6 (<code>stress-test-inscription.js</code>) — 500 VU en rampe de 10 secondes, profil complet (GET /events/{id} → POST /tickets → confirmation)<br>
+          <strong>Fréquence :</strong> mensuelle en staging (pré-production isolée)<br>
+          <strong>Critères de succès :</strong> <code>p95 &lt; 800 ms</code>, <code>error_rate &lt; 0,1%</code>, zéro sur-vente vérifiée par comptage post-test<br>
+          <strong>Alerte production :</strong> si taux d'erreur sur <code>/tickets</code> &gt; 1% sur 2 minutes → autoscaling immédiat + notification ops
+        </td>
+      </tr>
+    </table>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ============================= -->
+  <!-- §9.3 — RGPD                   -->
+  <!-- ============================= -->
+  <h3 class="sub-title" id="s93">§9.3 — RGPD</h3>
+
+  <h4 class="sub-sub-title">a) Registre des traitements (extrait)</h4>
+  <p>Conformément à l'article 30 du RGPD, le tableau ci-dessous liste les données personnelles traitées par SupEvents.</p>
+
+  <table class="gdpr-table">
+    <thead>
+      <tr>
+        <th>Donnée personnelle</th>
+        <th>Finalité</th>
+        <th>Base légale</th>
+        <th>Durée de rétention</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><strong>Email</strong></td>
+        <td>Authentification (SSO/OIDC), confirmation de ticket, notifications événements</td>
+        <td><span class="legal-basis lb-contract">Art. 6.1.b — Contrat</span></td>
+        <td>Durée du compte + 12 mois après suppression</td>
+      </tr>
+      <tr>
+        <td><strong>Nom / Prénom</strong></td>
+        <td>Identification sur profil et tickets, personnalisation emails</td>
+        <td><span class="legal-basis lb-contract">Art. 6.1.b — Contrat</span></td>
+        <td>Durée du compte ; pseudonymisé à la suppression (<code>user_[hash]</code>)</td>
+      </tr>
+      <tr>
+        <td><strong>Identifiant SSO (sub OIDC)</strong></td>
+        <td>Liaison compte SSO école ↔ compte SupEvents (authentification fédérée)</td>
+        <td><span class="legal-basis lb-contract">Art. 6.1.b — Contrat</span></td>
+        <td>Durée du compte + 12 mois</td>
+      </tr>
+      <tr>
+        <td><strong>Historique d'inscriptions</strong></td>
+        <td>Affichage historique utilisateur, gestion remboursements, audit interne</td>
+        <td><span class="legal-basis lb-contract">Art. 6.1.b — Contrat</span> + <span class="legal-basis lb-legal">Art. 6.1.c — Légal</span></td>
+        <td>Tickets gratuits : durée du compte. Tickets payants : 10 ans (comptable), nom anonymisé après suppression</td>
+      </tr>
+      <tr>
+        <td><strong>Identifiant customer Stripe</strong></td>
+        <td>Liaison système ↔ Stripe pour paiements et historique de facturation</td>
+        <td><span class="legal-basis lb-contract">Art. 6.1.b — Contrat</span></td>
+        <td>10 ans (données comptables) ; chiffré en base AES-256</td>
+      </tr>
+      <tr>
+        <td><strong>Adresse IP (logs d'accès)</strong></td>
+        <td>Sécurité (détection d'intrusion, rate-limiting, investigation)</td>
+        <td><span class="legal-basis lb-legit">Art. 6.1.f — Intérêt légitime</span></td>
+        <td>90 jours — suppression automatique via rotation des logs</td>
+      </tr>
+      <tr>
+        <td><strong>Préférences de notification</strong></td>
+        <td>Personnalisation des communications (emails d'événements à venir)</td>
+        <td><span class="legal-basis lb-consent">Art. 6.1.a — Consentement</span></td>
+        <td>Jusqu'au retrait du consentement ou suppression du compte</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4 class="sub-sub-title">b) Mécanismes de protection transverses</h4>
+  <ul class="mechanism-list" style="background:white;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+    <li><div><strong>Chiffrement TLS 1.3 en transit</strong> — périmètre : toutes les communications (client-API, API-API, API-PostgreSQL, API-Redis). Certificats renouvellés automatiquement via Let's Encrypt (cert-manager). HSTS <code>max-age=31536000, includeSubDomains</code>.</div></li>
+    <li><div><strong>Chiffrement de la base de données au repos</strong> — périmètre : volume PostgreSQL chiffré LUKS (AES-256 niveau disque). Colonnes sensibles (<code>stripe_customer_id</code>, <code>refresh_token_hash</code>) chiffrées au niveau applicatif via pgcrypto (AES-256 GCM), clés gérées par HashiCorp Vault.</div></li>
+    <li><div><strong>Hashage des refresh tokens</strong> — périmètre : table <code>users</code>, colonne <code>refresh_token_hash</code>. Seul le SHA-256 du token est stocké — en cas de compromission de la base, les tokens ne peuvent pas être utilisés.</div></li>
+    <li><div><strong>Gestion des secrets via HashiCorp Vault</strong> — périmètre : toute l'infrastructure. Aucun secret en clair dans les manifests Kubernetes. Injection via Vault Agent Sidecar. Rotation automatique trimestrielle.</div></li>
+    <li><div><strong>Séparation stricte des environnements</strong> — périmètre : dev / staging / production entièrement distincts. Jeux de données de dev synthétiques (Faker.js). Données de production jamais copiées en développement.</div></li>
+    <li><div><strong>Audit log inviolable</strong> — périmètre : toutes les actions sensibles (connexion, inscription, paiement, modification de profil, exercice de droits RGPD). Table <code>audit_events</code> en append-only (trigger bloquant UPDATE/DELETE). Export vers S3 immuable (Object Lock COMPLIANCE) toutes les heures.</div></li>
+    <li><div><strong>Minimisation des données dans les logs</strong> — périmètre : tous les microservices. Middleware de sanitisation masquant <code>email</code>, <code>cardNumber</code>, <code>cvv</code>, <code>token</code>, <code>clientSecret</code>. Classification RBAC des logs (PUBLIC / INTERNAL / RESTRICTED).</div></li>
+  </ul>
+
+  <h4 class="sub-sub-title">c) Procédures liées aux droits des personnes</h4>
+
+  <div class="rights-grid">
+    <!-- Art. 15 — Droit d'accès -->
+    <div class="right-card right-art15">
+      <div class="right-card-header">Art. 15 — Droit d'accès</div>
+      <div class="right-card-body">
+        <div class="right-row">
+          <label>Qui déclenche</label>
+          <span>Utilisateur depuis « Mes données » ou email à <code>dpo@supevents.fr</code></span>
+        </div>
+        <div class="right-row">
+          <label>Qui exécute</label>
+          <span>Script automatisé (données structurées) ; DPO pour les cas complexes (tiers)</span>
+        </div>
+        <div class="right-row">
+          <label>Délai contractuel</label>
+          <span>30 jours (Art. 12 RGPD). Objectif : export auto disponible &lt; 24h</span>
+        </div>
+        <div class="right-row">
+          <label>Contenu export</label>
+          <span>Fichier JSON signé : profil, historique inscriptions, préférences, identifiant SSO. Données Stripe accessibles via portail Stripe (lien fourni).</span>
+        </div>
+        <div class="right-row">
+          <label>Traces conservées</label>
+          <span>Date demande, identifiant utilisateur, canal, date livraison — 5 ans dans <code>audit_events</code></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Art. 17 — Droit à l'oubli -->
+    <div class="right-card right-art17">
+      <div class="right-card-header">Art. 17 — Droit à l'oubli</div>
+      <div class="right-card-body">
+        <div class="right-row">
+          <label>Qui déclenche</label>
+          <span>Utilisateur depuis « Supprimer mon compte » ou email à <code>dpo@supevents.fr</code></span>
+        </div>
+        <div class="right-row">
+          <label>Qui exécute</label>
+          <span>Script semi-auto + validation DPO pour les cas de blocage légal</span>
+        </div>
+        <div class="right-row">
+          <label>Délai contractuel</label>
+          <span>30 jours calendaires</span>
+        </div>
+        <div class="right-row">
+          <label>Traces conservées</label>
+          <span>Date demande, pseudonyme résultant, tables impactées, confirmation — 5 ans dans <code>audit_events</code></span>
+        </div>
+        <div class="tension-box">
+          <strong>⚖️ Cas tendu : factures vs. oubli</strong>
+          Les factures doivent être conservées 10 ans (Art. L123-22 CCom). <strong>Résolution :</strong> nom, email et identifiant SSO remplacés par le pseudonyme stable <code>anon_[SHA256(userId)[:12]]</code> dans toutes les tables. La facture est conservée sans identification de la personne physique. Le lien <code>stripe_customer_id</code> est supprimé de notre base. Les tokens actifs sont révoqués immédiatement dans Redis.
+        </div>
+      </div>
+    </div>
+
+    <!-- Art. 16 — Droit de rectification -->
+    <div class="right-card right-art16">
+      <div class="right-card-header">Art. 16 — Droit de rectification</div>
+      <div class="right-card-body">
+        <div class="right-row">
+          <label>Qui déclenche</label>
+          <span>Utilisateur via « Modifier mon profil » ou email à <code>dpo@supevents.fr</code> (données non modifiables via UI)</span>
+        </div>
+        <div class="right-row">
+          <label>Qui exécute</label>
+          <span>Modification directe via UI pour email/nom. DPO pour données propagées à des tiers.</span>
+        </div>
+        <div class="right-row">
+          <label>Délai contractuel</label>
+          <span>Via UI : immédiat. Via tiers : 30 jours calendaires</span>
+        </div>
+        <div class="right-row">
+          <label>Données propagées</label>
+          <span>
+            <strong>SendGrid :</strong> <code>PUT /v3/contactdb/recipients</code> (auto)<br>
+            <strong>Stripe :</strong> <code>POST /v1/customers/{id}</code> (auto)<br>
+            <strong>SSO :</strong> non modifiable ici → redirection support école
+          </span>
+        </div>
+        <div class="right-row">
+          <label>Traces conservées</label>
+          <span>Valeur avant/après, date, canal — 5 ans dans <code>audit_events</code></span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <hr class="section-divider">
+
+  <!-- ============================= -->
+  <!-- §10 — MATRICE DE TRAÇABILITÉ  -->
+  <!-- ============================= -->
+  <h2 class="section-title" id="s10"><span class="num">§10</span> Matrice de traçabilité</h2>
+
+  <p>La présente matrice croise l'intégralité des <strong>21 exigences du CDC SupEvents</strong> — 13 exigences fonctionnelles (EF 01 à EF 13) et 8 exigences non-fonctionnelles (ENF 01 à ENF 08) — avec les éléments de la DCT produits lors des TP 1.1 à 1.6. Une exigence est couverte si au moins un module de §7 ou une section de DCT en documente la conception. Les zones non couvertes sont signalées explicitement avec leur traitement prévu. L'objectif est qu'un auditeur externe puisse, en 30 minutes, vérifier que toutes les exigences du CDC sont traitées dans la documentation.</p>
+
+  <h3 class="sub-title" id="s101">§10.1 — Matrice principale</h3>
+
+  <table class="matrix-table">
+    <thead>
+      <tr>
+        <th style="width:8%">Réf.</th>
+        <th style="width:22%">Intitulé (court)</th>
+        <th style="width:28%">Module(s)</th>
+        <th style="width:27%">Section(s) DCT</th>
+        <th style="width:15%">ADR</th>
+      </tr>
+    </thead>
+    <tbody>
+      <!-- EF GROUP -->
+      <tr>
+        <td colspan="5" style="background:#1e3a8a;color:white;font-size:11px;font-weight:600;padding:6px 12px;letter-spacing:0.05em;text-transform:uppercase">
+          Exigences fonctionnelles (EF 01 – EF 13)
+        </td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 01</span></td>
+        <td>Création d'événements</td>
+        <td><span class="module-tag">EventModule §7.1</span></td>
+        <td><span class="section-tag">§6.4 Event</span> <span class="section-tag">§7.1</span> <span class="section-tag">§8 POST /events</span></td>
+        <td><span class="adr-tag">ADR-003</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 02</span></td>
+        <td>Catalogue public paginé</td>
+        <td><span class="module-tag">EventModule §7.1</span></td>
+        <td><span class="section-tag">§6.4</span> <span class="section-tag">§7.1</span> <span class="section-tag">§8 GET /events</span> <span class="section-tag">§9.2 PERF-01</span></td>
+        <td><span class="adr-tag">ADR-003</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 03</span></td>
+        <td>Fiche détail événement</td>
+        <td><span class="module-tag">EventModule §7.1</span></td>
+        <td><span class="section-tag">§6.4</span> <span class="section-tag">§7.1</span> <span class="section-tag">§8 GET /events/{id}</span></td>
+        <td><span class="adr-tag">ADR-003</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 04</span></td>
+        <td>Inscription payante</td>
+        <td><span class="module-tag">TicketModule §7.3</span> <span class="module-tag">PaymentModule §7.4</span></td>
+        <td><span class="section-tag">§6.4 Ticket Payment</span> <span class="section-tag">§7.3</span> <span class="section-tag">§7.4</span> <span class="section-tag">§8 POST /tickets</span> <span class="section-tag">§9.1.1 STRIDE</span></td>
+        <td><span class="adr-tag">ADR-001</span> <span class="adr-tag">ADR-002</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 05</span></td>
+        <td>Authentification SSO</td>
+        <td><span class="module-tag">AuthModule §7.2</span></td>
+        <td><span class="section-tag">§6.4 User</span> <span class="section-tag">§7.2</span> <span class="section-tag">§8 POST /auth/login</span> <span class="section-tag">§9.1</span></td>
+        <td><span class="adr-tag">ADR-004</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 06</span></td>
+        <td>Gestion de profil utilisateur</td>
+        <td><span class="module-tag">AuthModule §7.2</span> <span class="module-tag">UserModule §7.5</span></td>
+        <td><span class="section-tag">§6.4 User</span> <span class="section-tag">§7.2</span> <span class="section-tag">§7.5</span> <span class="section-tag">§8 GET/PUT /users/{id}</span> <span class="section-tag">§9.3 RGPD</span></td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 07</span></td>
+        <td>Confirmation ticket par email</td>
+        <td><span class="module-tag">TicketModule §7.3</span> <span class="module-tag">NotificationModule §7.6</span></td>
+        <td><span class="section-tag">§6.4 Ticket</span> <span class="section-tag">§7.3</span> <span class="section-tag">§7.6</span></td>
+        <td><span class="adr-tag">ADR-005</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 08</span></td>
+        <td>Annulation d'inscription</td>
+        <td><span class="module-tag">TicketModule §7.3</span> <span class="module-tag">PaymentModule §7.4</span></td>
+        <td><span class="section-tag">§6.4 Ticket</span> <span class="section-tag">§7.3</span> <span class="section-tag">§7.4</span> <span class="section-tag">§8 DELETE /tickets/{id}</span></td>
+        <td><span class="adr-tag">ADR-002</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 09</span></td>
+        <td>Remboursement Stripe</td>
+        <td><span class="module-tag">PaymentModule §7.4</span></td>
+        <td><span class="section-tag">§6.4 Payment</span> <span class="section-tag">§7.4</span> <span class="section-tag">§8 POST /payments/{id}/refund</span></td>
+        <td><span class="adr-tag">ADR-001</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 10</span></td>
+        <td>Tableau de bord organisateur</td>
+        <td><span class="module-tag">OrganizerModule §7.7</span></td>
+        <td><span class="section-tag">§6.4</span> <span class="section-tag">§7.7</span> <span class="section-tag">§8 GET /organizers/{id}/dashboard</span></td>
+        <td>—</td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 11</span></td>
+        <td>Réception webhook Stripe</td>
+        <td><span class="module-tag">PaymentModule §7.4</span></td>
+        <td><span class="section-tag">§7.4</span> <span class="section-tag">§8 POST /webhooks/stripe</span> <span class="section-tag">§9.1.2 STRIDE</span></td>
+        <td><span class="adr-tag">ADR-001</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 12</span></td>
+        <td>Export CSV des inscrits</td>
+        <td><span class="module-tag">OrganizerModule §7.7</span></td>
+        <td><span class="section-tag">§7.7</span></td>
+        <td><span class="not-covered">⚠ Non couvert — à traiter en TP 1.8</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 13</span></td>
+        <td>Recherche et filtrage catalogue</td>
+        <td><span class="module-tag">EventModule §7.1</span></td>
+        <td><span class="section-tag">§6.4</span> <span class="section-tag">§7.1</span> <span class="section-tag">§8 GET /events?q=&amp;category=</span> <span class="section-tag">§9.2 PERF-01 index</span></td>
+        <td><span class="adr-tag">ADR-003</span></td>
+      </tr>
+
+      <!-- ENF GROUP -->
+      <tr>
+        <td colspan="5" style="background:#5b21b6;color:white;font-size:11px;font-weight:600;padding:6px 12px;letter-spacing:0.05em;text-transform:uppercase">
+          Exigences non-fonctionnelles (ENF 01 – ENF 08)
+        </td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-enf">ENF 01</span></td>
+        <td>Performance p95 ≤ 500 ms</td>
+        <td><span class="module-tag">EventModule §7.1</span> <span class="module-tag">TicketModule §7.3</span></td>
+        <td><span class="section-tag">§9.2 PERF-01</span> <span class="section-tag">§9.2 PERF-03</span></td>
+        <td><span class="adr-tag">ADR-006</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-enf">ENF 02</span></td>
+        <td>Disponibilité 99,5 %</td>
+        <td><span class="module-tag">Tous les modules</span></td>
+        <td><span class="section-tag">§9.2 PERF-02</span></td>
+        <td><span class="adr-tag">ADR-007</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-enf">ENF 03</span></td>
+        <td>Sécurité paiements (PCI-DSS)</td>
+        <td><span class="module-tag">PaymentModule §7.4</span></td>
+        <td><span class="section-tag">§9.1.1 STRIDE Flux 1</span> <span class="section-tag">§9.1.2 STRIDE Flux 2</span></td>
+        <td><span class="adr-tag">ADR-001</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-enf">ENF 04</span></td>
+        <td>Protection données (RGPD)</td>
+        <td><span class="module-tag">AuthModule §7.2</span> <span class="module-tag">UserModule §7.5</span></td>
+        <td><span class="section-tag">§9.3 registre</span> <span class="section-tag">§9.3 mécanismes</span> <span class="section-tag">§9.3 procédures</span></td>
+        <td><span class="adr-tag">ADR-008</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-enf">ENF 05</span></td>
+        <td>Résistance à la sur-vente</td>
+        <td><span class="module-tag">TicketModule §7.3</span></td>
+        <td><span class="section-tag">§7.3 SELECT FOR UPDATE</span> <span class="section-tag">§9.2 PERF-03</span> <span class="section-tag">§9.1.1 STRIDE-D</span></td>
+        <td><span class="adr-tag">ADR-002</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-enf">ENF 06</span></td>
+        <td>Traçabilité (audit log)</td>
+        <td><span class="module-tag">Tous les modules</span></td>
+        <td><span class="section-tag">§9.1 STRIDE-R</span> <span class="section-tag">§9.3 audit log</span></td>
+        <td><span class="adr-tag">ADR-008</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-enf">ENF 07</span></td>
+        <td>Scalabilité horizontale</td>
+        <td><span class="module-tag">TicketModule §7.3</span> <span class="module-tag">PaymentModule §7.4</span></td>
+        <td><span class="section-tag">§9.2 PERF-03 autoscaling</span></td>
+        <td><span class="adr-tag">ADR-007</span></td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-enf">ENF 08</span></td>
+        <td>Déploiement continu (CI/CD)</td>
+        <td>—</td>
+        <td>—</td>
+        <td><span class="not-covered">⚠ Non couvert — à traiter en TP 1.8 (§11 CI/CD)</span></td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr class="section-divider">
+
+  <!-- ============================= -->
+  <!-- §10.2 — SYNTHÈSE              -->
+  <!-- ============================= -->
+  <h3 class="sub-title" id="s102">§10.2 — Synthèse</h3>
+
+  <div class="coverage-stats">
+    <div class="stat-card">
+      <span class="stat-value good">12/13</span>
+      <span class="stat-label">Exigences EF couvertes</span>
+      <div class="progress-bar-wrap"><div class="progress-bar" style="width:92%"></div></div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value warn">7/8</span>
+      <span class="stat-label">Exigences ENF couvertes</span>
+      <div class="progress-bar-wrap"><div class="progress-bar partial" style="width:87%"></div></div>
+    </div>
+    <div class="stat-card">
+      <span class="stat-value" style="color:#dc2626">2</span>
+      <span class="stat-label">Exigences en attente (TP 1.8)</span>
+      <div class="progress-bar-wrap"><div class="progress-bar partial" style="width:100%;background:linear-gradient(90deg,#dc2626,#ef4444)"></div></div>
+    </div>
+  </div>
+
+  <h4 class="sub-sub-title">Exigences non couvertes — liste explicite</h4>
+
+  <table class="gdpr-table">
+    <thead>
+      <tr><th>Réf.</th><th>Intitulé</th><th>Statut</th><th>Traitement prévu</th></tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="matrix-ref ref-ef">EF 12</span></td>
+        <td>Export CSV des inscrits</td>
+        <td><span class="tag tag-orange">Partiellement couverte</span></td>
+        <td>OrganizerModule conçu en §7.7, mais l'endpoint <code>GET /organizers/{id}/attendees/export</code> n'est pas documenté dans §8. <strong>TP 1.8 :</strong> documenter l'endpoint, format CSV et contraintes d'autorisation.</td>
+      </tr>
+      <tr>
+        <td><span class="matrix-ref ref-enf">ENF 08</span></td>
+        <td>Déploiement continu (CI/CD)</td>
+        <td><span class="tag tag-red">Non couverte</span></td>
+        <td>Section §11 (Infrastructure &amp; CI/CD) non encore produite. <strong>TP 1.8 :</strong> pipeline GitHub Actions, stratégie blue-green, politique de rollback.</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <h4 class="sub-sub-title">Lecture par colonne — couverture des modules §7</h4>
+
+  <table class="module-coverage-table">
+    <thead>
+      <tr>
+        <th>Module</th>
+        <th style="text-align:center">Nb. lignes dans la matrice</th>
+        <th>Analyse de cohérence</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><span class="module-tag">EventModule §7.1</span></td>
+        <td style="text-align:center">4</td>
+        <td><span class="status-ok">✅ Cohérent</span> — responsabilité unique : gestion du catalogue d'événements</td>
+      </tr>
+      <tr>
+        <td><span class="module-tag">AuthModule §7.2</span></td>
+        <td style="text-align:center">2 + ENF 04, 06</td>
+        <td><span class="status-ok">✅ Cohérent</span> — responsabilité unique : authentification et identité</td>
+      </tr>
+      <tr>
+        <td><span class="module-tag">TicketModule §7.3</span></td>
+        <td style="text-align:center">4 + PERF-03</td>
+        <td><span class="status-ok">✅ Cohérent</span> — responsabilité unique : cycle de vie des tickets</td>
+      </tr>
+      <tr>
+        <td><span class="module-tag">PaymentModule §7.4</span></td>
+        <td style="text-align:center">4 + ENF 03</td>
+        <td><span class="status-ok">✅ Cohérent</span> — responsabilité unique : orchestration des paiements Stripe</td>
+      </tr>
+      <tr>
+        <td><span class="module-tag">UserModule §7.5</span></td>
+        <td style="text-align:center">1 + ENF 04</td>
+        <td><span class="status-ok">✅ Acceptable</span> — module léger de gestion du profil utilisateur</td>
+      </tr>
+      <tr>
+        <td><span class="module-tag">NotificationModule §7.6</span></td>
+        <td style="text-align:center">1</td>
+        <td><span class="status-warn">⚠ Suspect</span> — Module transverse (email/push) n'apparaissant que sur une ligne. Justification : les autres notifications (rappels, alertes liste d'attente) ne sont pas encore dans les EF du CDC actuel. À enrichir en TP 1.8.</td>
+      </tr>
+      <tr>
+        <td><span class="module-tag">OrganizerModule §7.7</span></td>
+        <td style="text-align:center">2</td>
+        <td><span class="status-ok">✅ Cohérent</span> — responsabilité unique : outils pour les organisateurs</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <hr class="section-divider">
+
+  <!-- ============================= -->
+  <!-- PHASE D — REVUE DE COHÉRENCE  -->
+  <!-- ============================= -->
+  <h2 class="section-title" id="revue"><span class="num">D</span> Phase D — Revue de cohérence</h2>
+
+  <p>Vérification des cinq points de cohérence avant soumission de la pull request.</p>
+
+  <ul class="checklist" style="background:white;border:1px solid var(--border);border-radius:8px;overflow:hidden">
+    <li>
+      <span class="check-ok">✅</span>
+      <span>Les ENF du CDC (ENF 01 à ENF 08) sont toutes tracées dans la matrice — <strong>8 lignes ENF présentes</strong></span>
+    </li>
+    <li>
+      <span class="check-ok">✅</span>
+      <span>Aucune des 13 EF n'est orpheline — toutes ont au moins un module ou une section listée dans la matrice</span>
+    </li>
+    <li>
+      <span class="check-ok">✅</span>
+      <span>Le tableau STRIDE de chaque flux a ses <strong>6 lignes remplies</strong> (S, T, R, I, D, E) avec risques concrets et mesures techniques nommées</span>
+    </li>
+    <li>
+      <span class="check-ok">✅</span>
+      <span>La sous-section RGPD couvre les <strong>3 éléments</strong> : registre des traitements (7 lignes), mécanismes de protection (7 points), 3 procédures liées aux droits</span>
+    </li>
+    <li>
+      <span class="check-ok">✅</span>
+      <span>Aucune cellule de la matrice ne présente un module ou ADR inexistant — EF 12 et ENF 08 signalées explicitement comme non couvertes</span>
+    </li>
+  </ul>
+
+</div>
+
+<!-- ===== FOOTER ===== -->
+<div class="doc-footer">
+  <span>TP 1.6 — Exigences transverses &amp; Matrice de traçabilité SupEvents</span>
+  <span>THOMAS Alexandre · DCT SupEvents · 30 Avril 2026</span>
+</div>
+
+</div><!-- end page-wrapper -->
+
+</body>
+</html>
